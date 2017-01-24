@@ -1,7 +1,11 @@
+// #### serverless framework template
+
+import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scalariform.formatter.preferences._
 import sbt.Keys._
 import sbt._
 import sbtrelease.Version
-import AssemblyPlugin._
 
 
 name := "gaya"
@@ -18,9 +22,13 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-json_2.11" % "2.5.10",
   "com.typesafe.play" % "play-ws_2.11" % "2.5.10",
   "org.scalaz" %% "scalaz-core" % "7.2.8",
-  "net.codingwell" %% "scala-guice" % "4.1.0",
-  "com.jsuereth" %% "scala-arm" % "2.0"
-)
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.8.4",
+  "net.codingwell" %% "scala-guice" % "4.1.0"
+  //  ,
+  //  "com.jsuereth" %% "scala-arm" % "2.0"
+).map{
+  _.exclude("commons-logging", "commons-logging")
+}
 
 scalacOptions ++= Seq(
   "-unchecked",
@@ -31,9 +39,15 @@ scalacOptions ++= Seq(
 
 // deduplicate: different file contents found in the following:
 // - java.util.zip.ZipException: duplicate entry: META-INF/MANIFEST.MF
-// - commons-logging & jcl-over-slf4j
+// - commons-logging & jcl-over-slf4j2e
 assemblyMergeStrategy in assembly := {
-  case m if m.startsWith("META-INF") => MergeStrategy.discard
   case PathList("reference.conf") => MergeStrategy.concat
+  case m if m.startsWith("META-INF") => MergeStrategy.discard
   case _ => MergeStrategy.first
 }
+
+SbtScalariform.scalariformSettings ++ Seq(
+  ScalariformKeys.preferences := ScalariformKeys.preferences.value
+    .setPreference(AlignSingleLineCaseStatements, true)
+    .setPreference(DoubleIndentClassDeclaration, true)
+)

@@ -31,7 +31,7 @@ class Typetalk @Inject() (val ws: WSClient) {
 
     ws
       .url(endpoint)
-      .withHeaders("X-Typetalk-Token" -> sys.env.getOrElse("TYPETALK_TOKEN", sys.error("require environment variable: TYPETALK_TOKEN")))
+      .withHeaders("X-Typetalk-Token" -> sys.env.get("TYPETALK_TOKEN").filter(_.nonEmpty).getOrElse(sys.error("require environment variable: TYPETALK_TOKEN")))
       .post(file)
       .map(
         _.json
